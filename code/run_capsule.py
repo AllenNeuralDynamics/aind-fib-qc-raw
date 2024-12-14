@@ -25,7 +25,7 @@ if __name__ == "__main__":
     data_folder = Path("../data")
     results_folder = Path("../results")
 
-    parser.add_argument("--asset-name", type=str, default = 'behavior_746346_2024-12-04_12-50-17')
+    parser.add_argument("--asset-name", type=str, default = 'behavior_746346_2024-12-12_12-41-44')
 
     # Parse the command-line arguments
     args = parser.parse_args()
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
 
         #%% read behavior json file
-        behavior_json_path = sessionfolder + '/behavior/' + sessionname + '.json'
+        behavior_json_path = sessionfolder + '/behavior/behavior_' + sessionname + '.json'
 
         with open(behavior_json_path, 'r', encoding='utf-8') as f:
             behavior_json = json.load(f)
