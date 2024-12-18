@@ -22,10 +22,10 @@ from pathlib import Path
 import logging
 from aind_log_utils.log import setup_logging
 
-parser = argparse.ArgumentParser(description="Raw fiber QC")
+#parser = argparse.ArgumentParser(description="Raw fiber QC")
 
-data_folder = Path("../data")
-results_folder = Path("../results")
+#data_folder = Path("../data")
+#results_folder = Path("../results")
 
 #parser.add_argument("--asset-name", type=str, default = 'behavior_746346_2024-12-12_12-41-44')
 
@@ -42,6 +42,8 @@ results_folder = Path("../results")
 #if asset_name is not None:
 #    sessionfolder = str(data_folder / asset_name)
 
+
+#%%
 #sessionfolder = '/root/capsule/data/behavior_746346_2024-12-12_12-41-44'
 sessionfolder = '/root/capsule/data/behavior_754430_2024-12-16_13-03-21'
 
