@@ -1,9 +1,11 @@
+#development
+
 #%% Import
 import csv
 import glob
 import json
 
-import matplotlib
+#import matplotlib
 #matplotlib.use('Agg') # set the backend before importing pyplot
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -40,7 +42,8 @@ results_folder = Path("../results")
 #if asset_name is not None:
 #    sessionfolder = str(data_folder / asset_name)
 
-sessionfolder = '/root/capsule/data/behavior_746346_2024-12-12_12-41-44'
+#sessionfolder = '/root/capsule/data/behavior_746346_2024-12-12_12-41-44'
+sessionfolder = '/root/capsule/data/behavior_754430_2024-12-16_13-03-21'
 
 sessionname = sessionfolder.split('behavior_')[1]
 fibfolder = sessionfolder + '/fib'
@@ -91,9 +94,8 @@ RisingTime=behavior_json['B_PhotometryRisingTimeHarp']
 FallingTime=behavior_json['B_PhotometryFallingTimeHarp']
 
 #%%raw data
-%matplotlib inline
-#plt.figure(figsize=(8, 4))
-plt.figure()
+#%matplotlib inline
+plt.figure(figsize=(8, 4))
 for i_panel in range(4):
     plt.subplot(2,4,i_panel+1)
     plt.plot(data1[:,i_panel+1],color='darkgreen')
@@ -116,8 +118,8 @@ plt.savefig('/root/capsule/results/raw_traces.pdf')
 
 #%%
 #sensor floor (last ROI)
-#plt.figure(figsize=(8, 2))
-plt.figure()
+plt.figure(figsize=(8, 2))
+#plt.figure()
 
 plt.subplot(1,3,1)
 plt.hist(data1[:,-1],bins=100, range=(255, 270))
@@ -152,7 +154,7 @@ plt.savefig('/root/capsule/results/CMOS_Floor.pdf')
 
 #%% sync pulse diff
 plt.figure()
-plt.hist(np.diff(RisingTime))
+plt.hist(np.diff(RisingTime), bins=100, range=(0, 0.2))
 plt.title("sync pulse diff")
 plt.ylabel("counts")
 plt.xlabel("ms")
@@ -344,13 +346,14 @@ eval4 = QCEvaluation(
     modality=Modality.FIB,
     stage=Stage.RAW,
     metrics=[
-        QCMetric(name="Floor average signal in Green channel", value=float(np.max(np.diff(data1[10:-2,1]))), status_history=[Bool2Status(Metrics["NoSuddenChangeInSignal"])],reference=uri0)
+        QCMetric(name="1st derivative of Green channel", value=float(np.max(np.diff(data1[10:-2,1]))), status_history=[Bool2Status(Metrics["NoSuddenChangeInSignal"])],reference=uri0)
     ],
-    allow_failed_metrics=False,
+    allow_failed_metrics=True,
     description="Pass when 1st derivatives of signals are < 5000"
 )
 
-qc = QualityControl(evaluations=[eval0, eval1, eval2, eval3, eval4])
+qceval_list = [eval0, eval1, eval2, eval3, eval4]
+qc = QualityControl(evaluations=qceval_list)
 qc.write_standard_file(output_directory="/results")
 
 
@@ -384,12 +387,10 @@ def query_docdb_id(asset_name: str):
     docdb_id = response[0]["_id"]
     return docdb_id
 
-# %%
 
-docdb_id = query_docdb_id(os.path.basename(sessionfolder))
+docdb_id = query_docdb_id(os.path.basename(sessionfoldername))
 
-
-#%%
+#%% push to DocDB
 session = boto3.Session()
 credentials = session.get_credentials()
 host = "api.allenneuraldynamics.org"
@@ -403,17 +404,16 @@ aws_region='us-west-2',
 aws_service='execute-api'
 )
 url = f"https://{host}/v1/add_qc_evaluation"
-post_request_content = {"data_asset_id": docdb_id,
-                        "qc_evaluation": qc.model_dump(mode='json')}
-response = requests.post(url=url, auth=auth, 
-                        json=post_request_content)
 
-if response.status_code != 200:
-    print(response.status_code)
-    print(response.text)
+for eval_ii in qceval_list:
+    post_request_content = {"data_asset_id": docdb_id,
+                            "qc_evaluation": eval_ii.model_dump(mode='json')}
 
+    response = requests.post(url=url, auth=auth, 
+                            json=post_request_content)
 
-
-
+    if response.status_code != 200:
+        print(response.status_code)
+        print(response.text)
 
 # %%
