@@ -1,14 +1,19 @@
-# aind-fib-qc-raw
+# aind-fib-qc-raw (ver 0.1)
 
-QC capsule for fiber photometry (fib) data acquired with HARP/Bonsai-based behavior (e.g. Dynamic Foraging)
+QC capsule for fiber photometry (fib) raw data acquired with HARP/Bonsai-based behavior (e.g. Dynamic Foraging)
 
 run_capsule.py : main script
 run_capsule_dev.py : for develipment, in VScode + jupyter-extension env.
 
 
-To do:
+___
+1.reading rawdata
 
--to populate more QC/Evaluations 
+2.generating figures and metrics
 
--generate figures to be sent to QCportal
--integrated into the fiber pipeline (before the nwb packaging)
+3.submitting figures to kachery to obtain unique url
+
+4.Composing QC
+
+5.Pushing QC to DocDB
+
